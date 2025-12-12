@@ -5,7 +5,7 @@ object BuildConfig {
     val parchmentMappings: String? = null
     val loaderVersion: String = "0.18.2"
 
-    val modVersion: String = "$minecraftVersion-0.0.1"
+    val modVersion: String = "$minecraftVersion-0.0.2"
     val mavenGroup: String = "com.macuguita.petal_smp"
     val modId: String = "petal_tweaks"
     val modName: String = "Petal SMP Tweaks"

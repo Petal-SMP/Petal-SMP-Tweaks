@@ -6,6 +6,10 @@ import com.macuguita.petal_smp.common.attachments.GivenStarterItemsAttachedData
 import com.macuguita.petal_smp.common.attachments.PetalAttachedTypes
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
+import net.minecraft.ChatFormatting
+import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.Style
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.item.ItemStack
@@ -21,10 +25,12 @@ object PetalSMPTweaks : ModInitializer {
 
     override fun onInitialize() {
         Reflection.initialize(PetalAttachedTypes::class.java)
-        ServerPlayerEvents.JOIN.register { player ->
+        ServerPlayConnectionEvents.JOIN.register { handler, sender, server ->
+            val player = handler.player
             if (!GivenStarterItemsAttachedData.getStarterItems(player)) {
                 givePokeballs(player)
                 givePokedex(player)
+                server.playerList.broadcastSystemMessage(Component.literal(player.name.string + " has joined for the first time, say hi!").withStyle(ChatFormatting.YELLOW), false)
                 GivenStarterItemsAttachedData.setStarterItems(player, true)
             }
         }
