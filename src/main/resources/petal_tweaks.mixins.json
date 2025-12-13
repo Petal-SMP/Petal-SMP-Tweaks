@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "com.macuguita.petal_smp.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "PlayerDataStorageMixin",
+    "PlayerListAccessor"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+	}
+}

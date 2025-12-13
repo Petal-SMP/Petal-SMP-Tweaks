@@ -4,25 +4,35 @@ import com.cobblemon.mod.common.CobblemonItems
 import com.google.common.reflect.Reflection
 import com.macuguita.petal_smp.common.attachments.GivenStarterItemsAttachedData
 import com.macuguita.petal_smp.common.attachments.PetalAttachedTypes
-import com.macuguita.petal_smp.common.tpa.commands.TpaAcceptCommand
-import com.macuguita.petal_smp.common.tpa.commands.TpaCommand
-import com.macuguita.petal_smp.common.tpa.commands.TpaHereCommand
+import com.macuguita.petal_smp.common.commands.admin.OfflinePlayerPosCommand
+import com.macuguita.petal_smp.common.commands.admin.OfflineTpCommand
+import com.macuguita.petal_smp.common.commands.tpa.TpaAcceptCommand
+import com.macuguita.petal_smp.common.commands.tpa.TpaCommand
+import com.macuguita.petal_smp.common.commands.tpa.TpaHereCommand
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
+import net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory
+import net.fabricmc.fabric.api.gamerule.v1.GameRuleRegistry
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.GameRules
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 object PetalSMPTweaks : ModInitializer {
-    const val MOD_ID: String = "petal-smp-tweaks"
+    const val MOD_ID: String = "petal_tweaks"
     val LOGGER: Logger = LoggerFactory.getLogger(MOD_ID)
 
     fun id(name: String) = ResourceLocation.fromNamespaceAndPath(MOD_ID, name)
+
+    val REQUEST_EXPIRY_MS: GameRules.Key<GameRules.IntegerValue?> = GameRuleRegistry.register(
+        "tpaRequestTimeoutMilliSeconds",
+        GameRules.Category.MISC, GameRuleFactory.createIntRule(60_000)
+    )
 
     override fun onInitialize() {
         Reflection.initialize(PetalAttachedTypes::class.java)
@@ -43,6 +53,8 @@ object PetalSMPTweaks : ModInitializer {
             TpaCommand.register(dispatcher)
             TpaHereCommand.register(dispatcher)
             TpaAcceptCommand.register(dispatcher)
+            OfflinePlayerPosCommand.register(dispatcher)
+            OfflineTpCommand.register(dispatcher)
         }
     }
 

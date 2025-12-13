@@ -1,8 +1,7 @@
-package com.macuguita.petal_smp.common.tpa.commands
+package com.macuguita.petal_smp.common.commands.tpa
 
-import com.macuguita.petal_smp.common.tpa.TpaManager
-import com.macuguita.petal_smp.common.tpa.TpaRequest
-import com.macuguita.petal_smp.common.tpa.TpaType
+import com.macuguita.petal_smp.common.PetalSMPTweaks
+import com.macuguita.petal_smp.common.commands.CommandResult
 import com.mojang.brigadier.context.CommandContext
 import net.minecraft.ChatFormatting
 import net.minecraft.commands.CommandSourceStack
@@ -11,11 +10,6 @@ import net.minecraft.network.chat.ClickEvent
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.HoverEvent
 import net.minecraft.server.level.ServerPlayer
-
-enum class CommandResult(val value: Int) {
-    ERROR(0),
-    SUCCESS(1)
-}
 
 fun handle(
     ctx: CommandContext<CommandSourceStack>,
@@ -29,10 +23,7 @@ fun handle(
     }
 
     if (sender.uuid == target.uuid) {
-        sender.sendSystemMessage(
-            Component.literal("You cannot request a teleport to yourself")
-                .withStyle(ChatFormatting.RED)
-        )
+        ctx.source.sendFailure(Component.literal("You cannot request a teleport to yourself"))
         return CommandResult.ERROR.value
     }
 
@@ -42,13 +33,12 @@ fun handle(
             target = target.uuid,
             type = type,
             timestamp = System.currentTimeMillis()
-        )
+        ),
+        sender.level().gameRules.getRule(PetalSMPTweaks.REQUEST_EXPIRY_MS)?.get()
     )
 
     if (!success) {
-        sender.sendSystemMessage(
-            Component.literal("You already have a pending request to this player")
-        )
+        ctx.source.sendFailure(Component.literal("You already have a pending request to this player"))
         return CommandResult.ERROR.value
     }
 
