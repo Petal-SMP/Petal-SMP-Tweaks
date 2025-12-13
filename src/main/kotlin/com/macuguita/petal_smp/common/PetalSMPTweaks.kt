@@ -4,8 +4,10 @@ import com.cobblemon.mod.common.CobblemonItems
 import com.google.common.reflect.Reflection
 import com.macuguita.petal_smp.common.attachments.GivenStarterItemsAttachedData
 import com.macuguita.petal_smp.common.attachments.PetalAttachedTypes
+import com.macuguita.petal_smp.common.commands.CommandRegistrator
 import com.macuguita.petal_smp.common.commands.admin.OfflinePlayerPosCommand
 import com.macuguita.petal_smp.common.commands.admin.OfflineTpCommand
+import com.macuguita.petal_smp.common.commands.spawn.SpawnCommand
 import com.macuguita.petal_smp.common.commands.tpa.TpaAcceptCommand
 import com.macuguita.petal_smp.common.commands.tpa.TpaCommand
 import com.macuguita.petal_smp.common.commands.tpa.TpaHereCommand
@@ -36,6 +38,10 @@ object PetalSMPTweaks : ModInitializer {
 
     override fun onInitialize() {
         Reflection.initialize(PetalAttachedTypes::class.java)
+        registerEvents()
+    }
+
+    fun registerEvents() {
         ServerPlayConnectionEvents.JOIN.register { handler, _, server ->
             val player = handler.player
             if (!GivenStarterItemsAttachedData.getStarterItems(player)) {
@@ -48,14 +54,7 @@ object PetalSMPTweaks : ModInitializer {
                 GivenStarterItemsAttachedData.setStarterItems(player, true)
             }
         }
-
-        CommandRegistrationCallback.EVENT.register { dispatcher, _, _ ->
-            TpaCommand.register(dispatcher)
-            TpaHereCommand.register(dispatcher)
-            TpaAcceptCommand.register(dispatcher)
-            OfflinePlayerPosCommand.register(dispatcher)
-            OfflineTpCommand.register(dispatcher)
-        }
+        CommandRegistrationCallback.EVENT.register(CommandRegistrator.RegisterCommands())
     }
 
     fun giveStacks(player: ServerPlayer, stack: ItemStack) {
