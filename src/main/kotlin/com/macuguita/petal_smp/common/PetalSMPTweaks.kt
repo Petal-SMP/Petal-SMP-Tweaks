@@ -4,16 +4,17 @@ import com.cobblemon.mod.common.CobblemonItems
 import com.google.common.reflect.Reflection
 import com.macuguita.petal_smp.common.attachments.GivenStarterItemsAttachedData
 import com.macuguita.petal_smp.common.attachments.PetalAttachedTypes
+import com.macuguita.petal_smp.common.tpa.commands.TpaAcceptCommand
+import com.macuguita.petal_smp.common.tpa.commands.TpaCommand
+import com.macuguita.petal_smp.common.tpa.commands.TpaHereCommand
 import net.fabricmc.api.ModInitializer
-import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
-import net.minecraft.network.chat.Style
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.item.ItemStack
-import org.apache.logging.log4j.core.jmx.Server
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -25,30 +26,39 @@ object PetalSMPTweaks : ModInitializer {
 
     override fun onInitialize() {
         Reflection.initialize(PetalAttachedTypes::class.java)
-        ServerPlayConnectionEvents.JOIN.register { handler, sender, server ->
+        ServerPlayConnectionEvents.JOIN.register { handler, _, server ->
             val player = handler.player
             if (!GivenStarterItemsAttachedData.getStarterItems(player)) {
                 givePokeballs(player)
                 givePokedex(player)
-                server.playerList.broadcastSystemMessage(Component.literal(player.name.string + " has joined for the first time, say hi!").withStyle(ChatFormatting.YELLOW), false)
+                server.playerList.broadcastSystemMessage(
+                    Component.literal(player.name.string + " has joined for the first time, say hi!")
+                        .withStyle(ChatFormatting.YELLOW), false
+                )
                 GivenStarterItemsAttachedData.setStarterItems(player, true)
             }
+        }
+
+        CommandRegistrationCallback.EVENT.register { dispatcher, _, _ ->
+            TpaCommand.register(dispatcher)
+            TpaHereCommand.register(dispatcher)
+            TpaAcceptCommand.register(dispatcher)
         }
     }
 
     fun giveStacks(player: ServerPlayer, stack: ItemStack) {
         if (!player.getInventory().add(stack)) {
-            player.drop(stack, true);
+            player.drop(stack, true)
         }
     }
 
     fun givePokeballs(player: ServerPlayer) {
-        val pokeballs = numToPokeball(player.uuid.hashCode()%6, 10)
+        val pokeballs = numToPokeball(player.uuid.hashCode() % 6, 10)
         giveStacks(player, pokeballs)
     }
 
     fun givePokedex(player: ServerPlayer) {
-        val pokedex = numToPokedex(player.uuid.hashCode()%6)
+        val pokedex = numToPokedex(player.uuid.hashCode() % 6)
         giveStacks(player, pokedex)
     }
 
