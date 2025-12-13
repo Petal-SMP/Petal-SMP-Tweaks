@@ -1,9 +1,15 @@
 {
   "schemaVersion": 1,
   "id": "petal_tweaks",
-  "version": "1.21.1-0.0.5",
+  "version": "1.21.1-0.0.6",
   "environment": "*",
   "entrypoints": {
+    "server": [
+      {
+        "value": "com.macuguita.petal_smp.server.ServerEntrypoint",
+        "adapter": "kotlin"
+      }
+    ],
     "main": [
       {
         "value": "com.macuguita.petal_smp.common.PetalSMPTweaks",

@@ -7,7 +7,7 @@ import net.minecraft.commands.Commands.argument
 import net.minecraft.commands.Commands.literal
 import net.minecraft.commands.arguments.EntityArgument
 
-object TpaHereCommand: CommandRegistrator {
+object TpaHereCommand : CommandRegistrator {
     override fun register(dispatcher: CommandDispatcher<CommandSourceStack>) {
         dispatcher.register(
             literal("tpahere")

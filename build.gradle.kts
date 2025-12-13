@@ -118,6 +118,7 @@ tasks.register<net.fabricmc.loom.task.FabricModJsonV1Task>("genModJson") {
         environment = "*"
 
         entrypoint("main", "com.macuguita.petal_smp.common.PetalSMPTweaks", "kotlin")
+        entrypoint("server", "com.macuguita.petal_smp.server.ServerEntrypoint", "kotlin")
 
         depends("fabricloader", ">=${BuildConfig.loaderVersion}")
         depends("minecraft", BuildConfig.minecraftVersionRange)

@@ -26,7 +26,7 @@ object TpaManager {
         cleanup(target, expiryMs)
         val list = requests[target] ?: return null
         val req = list.find { it.requester == requester }
-        if (req != null) list.remove(req)
+        req?.let { list.remove(it) }
         return req
     }
 

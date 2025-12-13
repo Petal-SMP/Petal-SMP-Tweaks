@@ -5,12 +5,6 @@ import com.google.common.reflect.Reflection
 import com.macuguita.petal_smp.common.attachments.GivenStarterItemsAttachedData
 import com.macuguita.petal_smp.common.attachments.PetalAttachedTypes
 import com.macuguita.petal_smp.common.commands.CommandRegistrator
-import com.macuguita.petal_smp.common.commands.admin.OfflinePlayerPosCommand
-import com.macuguita.petal_smp.common.commands.admin.OfflineTpCommand
-import com.macuguita.petal_smp.common.commands.spawn.SpawnCommand
-import com.macuguita.petal_smp.common.commands.tpa.TpaAcceptCommand
-import com.macuguita.petal_smp.common.commands.tpa.TpaCommand
-import com.macuguita.petal_smp.common.commands.tpa.TpaHereCommand
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory

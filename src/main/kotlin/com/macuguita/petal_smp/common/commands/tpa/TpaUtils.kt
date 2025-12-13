@@ -15,12 +15,8 @@ fun handle(
     ctx: CommandContext<CommandSourceStack>,
     type: TpaType
 ): Int {
-    val sender = ctx.source.player
-    val target = EntityArgument.getPlayer(ctx, "player")
-
-    if (sender == null || target == null) {
-        return CommandResult.ERROR.value
-    }
+    val sender = ctx.source.player ?: return CommandResult.ERROR.value
+    val target = EntityArgument.getPlayer(ctx, "player") ?: return CommandResult.ERROR.value
 
     if (sender.uuid == target.uuid) {
         ctx.source.sendFailure(Component.literal("You cannot request a teleport to yourself"))

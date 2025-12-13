@@ -28,7 +28,7 @@ object OfflineTpCommand : CommandRegistrator {
                                     val pos = BlockPosArgument.getLoadedBlockPos(ctx, "pos")
                                     val server = ctx.source.server
 
-                                    if (server.playerList.getPlayer(player.id) != null) {
+                                    server.playerList.getPlayer(player.id)?.let {
                                         ctx.source.sendFailure(Component.literal("The player has to be offline"))
                                         return@executes CommandResult.ERROR.value
                                     }

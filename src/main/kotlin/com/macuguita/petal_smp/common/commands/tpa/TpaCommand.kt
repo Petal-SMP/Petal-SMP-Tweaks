@@ -7,7 +7,7 @@ import net.minecraft.commands.Commands.argument
 import net.minecraft.commands.Commands.literal
 import net.minecraft.commands.arguments.EntityArgument
 
-object TpaCommand: CommandRegistrator {
+object TpaCommand : CommandRegistrator {
     override fun register(dispatcher: CommandDispatcher<CommandSourceStack>) {
         dispatcher.register(
             literal("tpa")

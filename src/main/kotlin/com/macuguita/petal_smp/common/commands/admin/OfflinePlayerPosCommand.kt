@@ -28,7 +28,7 @@ object OfflinePlayerPosCommand : CommandRegistrator {
                                 ?: return@executes CommandResult.ERROR.value
                             val server = ctx.source.server
 
-                            if (server.playerList.getPlayer(player.getId()) != null) {
+                            server.playerList.getPlayer(player.id)?.let {
                                 ctx.source.sendFailure(Component.literal("The player has to be offline"))
                                 return@executes CommandResult.ERROR.value
                             }
@@ -38,13 +38,13 @@ object OfflinePlayerPosCommand : CommandRegistrator {
 
                             val list = nbt.getList("Pos", Tag.TAG_DOUBLE.toInt())
 
-                            val x: Double = list.getDouble(0)
-                            val y: Double = list.getDouble(1)
-                            val z: Double = list.getDouble(2)
+                            val x = list.getDouble(0)
+                            val y = list.getDouble(1)
+                            val z = list.getDouble(2)
 
                             val blockPos = BlockPos(x.toInt(), y.toInt(), z.toInt())
 
-                            val text: Component? = Component.literal("${player.name} was last seen at ")
+                            val text = Component.literal("${player.name} was last seen at ")
                                 .append(
                                     Component.literal("[${blockPos.x}, ${blockPos.y}, ${blockPos.z}]")
                                         .withStyle({
