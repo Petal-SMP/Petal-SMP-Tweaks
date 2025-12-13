@@ -43,6 +43,7 @@ repositories {
         Triple("Shedaniel", "https://maven.shedaniel.me/", listOf("me.shedaniel.cloth")),
         Triple("TerraformersMC", "https://maven.terraformersmc.com/", listOf("com.terraformersmc", "dev.emi")),
         Triple("Modrinth", "https://api.modrinth.com/maven", listOf("maven.modrinth")),
+        Triple("ParchmentMC", "https://maven.parchmentmc.org", listOf("org.parchmentmc.data")),
     )
 
     exclusiveRepos.forEach { (name, url, groups) ->
@@ -66,7 +67,10 @@ repositories {
 
 dependencies {
     minecraft("com.mojang:minecraft:${BuildConfig.minecraftVersion}")
-	mappings(loom.officialMojangMappings())
+	mappings(loom.layered {
+        officialMojangMappings()
+        parchment("org.parchmentmc.data:parchment-${BuildConfig.minecraftVersion}:${BuildConfig.parchmentMappings}@zip")
+    })
     modImplementation("net.fabricmc:fabric-loader:${BuildConfig.loaderVersion}")
 
     modImplementation("net.fabricmc.fabric-api:fabric-api:${BuildConfig.fabricVersion}")
