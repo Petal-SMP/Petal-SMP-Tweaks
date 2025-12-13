@@ -1,4 +1,4 @@
-package com.macuguita.petal_smp.common.tpa
+package com.macuguita.petal_smp.common.commands.tpa
 
 import java.util.*
 

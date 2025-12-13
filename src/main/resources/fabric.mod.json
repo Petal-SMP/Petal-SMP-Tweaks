@@ -11,6 +11,10 @@
       }
     ]
   },
+  "mixins": [
+    "petal_tweaks.mixins.json"
+  ],
+  "accessWidener": "petal_tweaks.classtweaker",
   "depends": {
     "fabricloader": "\u003e\u003d0.18.2",
     "minecraft": "\u003e\u003d1.21.1",

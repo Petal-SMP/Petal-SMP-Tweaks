@@ -19,8 +19,8 @@ loom {
             }
         }
     }
-    if (project.file("src/main/resources/${BuildConfig.modId}.accesswidener").exists()) {
-        accessWidenerPath = project.file("src/main/resources/${BuildConfig.modId}.accesswidener")
+    if (project.file("src/main/resources/${BuildConfig.modId}.classtweaker").exists()) {
+        accessWidenerPath = project.file("src/main/resources/${BuildConfig.modId}.classtweaker")
     }
 }
 
@@ -108,8 +108,8 @@ tasks.register<net.fabricmc.loom.task.FabricModJsonV1Task>("genModJson") {
         if (project.file("src/main/resources/${BuildConfig.modId}.mixins.json").exists()) {
             mixin("${BuildConfig.modId}.mixins.json")
         }
-        if (project.file("src/main/resources/${BuildConfig.modId}.accesswidener").exists()) {
-            accessWidener = "${BuildConfig.modId}.accesswidener"
+        if (project.file("src/main/resources/${BuildConfig.modId}.classtweaker").exists()) {
+            accessWidener = "${BuildConfig.modId}.classtweaker"
         }
         environment = "*"
 

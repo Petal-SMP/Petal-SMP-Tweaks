@@ -1,8 +1,8 @@
-package com.macuguita.petal_smp.common.tpa.commands
+package com.macuguita.petal_smp.common.commands.tpa
 
-import com.macuguita.petal_smp.common.tpa.TpaManager
-import com.macuguita.petal_smp.common.tpa.TpaRequest
-import com.macuguita.petal_smp.common.tpa.TpaType
+import com.macuguita.petal_smp.common.PetalSMPTweaks
+import com.macuguita.petal_smp.common.commands.CommandRegistrator
+import com.macuguita.petal_smp.common.commands.CommandResult
 import com.mojang.brigadier.CommandDispatcher
 import net.minecraft.ChatFormatting
 import net.minecraft.commands.CommandSourceStack
@@ -12,20 +12,19 @@ import net.minecraft.commands.arguments.EntityArgument
 import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerPlayer
 
-object TpaAcceptCommand {
-    fun register(dispatcher: CommandDispatcher<CommandSourceStack>) {
+object TpaAcceptCommand: CommandRegistrator {
+    override fun register(dispatcher: CommandDispatcher<CommandSourceStack>) {
         dispatcher.register(
             literal("tpaaccept")
                 .executes {
                     val player = it.source.playerOrException
-                    val req = TpaManager.popMostRecent(player.uuid)
+                    val req = TpaManager.popMostRecent(
+                        player.uuid,
+                        player.level().gameRules.getRule(PetalSMPTweaks.REQUEST_EXPIRY_MS)?.get()
+                    )
 
                     if (req == null) {
-                        player.sendSystemMessage(
-                            Component.literal("You have no pending requests").withStyle(
-                                ChatFormatting.RED
-                            )
-                        )
+                        it.source.sendFailure(Component.literal("You have no pending requests"))
                         return@executes CommandResult.ERROR.value
                     }
 
@@ -38,14 +37,13 @@ object TpaAcceptCommand {
                             val player = it.source.playerOrException
                             val requester = EntityArgument.getPlayer(it, "player")
 
-                            val req = TpaManager.popFromRequester(player.uuid, requester.uuid)
+                            val req = TpaManager.popFromRequester(
+                                player.uuid, requester.uuid,
+                                player.level().gameRules.getRule(PetalSMPTweaks.REQUEST_EXPIRY_MS)?.get()
+                            )
 
                             if (req == null) {
-                                player.sendSystemMessage(
-                                    Component.literal("You have no request from that player").withStyle(
-                                        ChatFormatting.RED
-                                    )
-                                )
+                                it.source.sendFailure(Component.literal("You have no request from that player"))
                                 return@executes CommandResult.ERROR.value
                             }
 
