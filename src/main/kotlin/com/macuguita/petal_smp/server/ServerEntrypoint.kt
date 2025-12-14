@@ -1,9 +1,33 @@
+/*
+ * Copyright (c) 2025 macuguita
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+ * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
+ * OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
 package com.macuguita.petal_smp.server
 
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import com.macuguita.petal_smp.common.PetalSMPTweaks
 import net.fabricmc.api.DedicatedServerModInitializer
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
+import net.fabricmc.fabric.api.message.v1.ServerMessageEvents
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
 import net.minecraft.server.level.ServerPlayer
 import java.net.URI
@@ -13,55 +37,78 @@ import java.net.http.HttpResponse
 
 object ServerEntrypoint : DedicatedServerModInitializer {
 
-    private val HTTP_CLIENT: HttpClient = HttpClient.newHttpClient()
-    private val GSON: Gson = Gson()
+    private val httpClient = HttpClient.newHttpClient()
+    private val gson = Gson()
 
     override fun onInitializeServer() {
         val config = Config.loadOrCreate()
 
         if (config.discordWebhookUrl.isBlank()) return
 
-        ServerPlayConnectionEvents.JOIN.register(ServerPlayConnectionEvents.Join { handler, _, _ ->
-            announce(
-                handler.player,
-                handler.player.name.string + " joined the server",
-                config.discordWebhookUrl
-            )
-        })
-        ServerPlayConnectionEvents.DISCONNECT.register(ServerPlayConnectionEvents.Disconnect { handler, _ ->
-            announce(
-                handler.player,
-                handler.player.name.string + " left the server",
-                config.discordWebhookUrl
-            )
-        })
+        registerEvents(config)
     }
 
-    private fun announce(player: ServerPlayer, message: String, webookUrl: String) {
-        val webhook = Webhook(
-            player.name.string,
-            message,
-            getAvatarUrl(player),
-            Webhook.AllowedMentions.NONE
-        )
-        val json: String = GSON.toJson(webhook)
+    private fun registerEvents(config: Config) {
+        ServerPlayConnectionEvents.JOIN.register { handler, _, _ ->
+            systemMessage(config, "${handler.player.name.string} joined the server")
+        }
 
-        val request: HttpRequest = HttpRequest.newBuilder()
-            .uri(URI.create(webookUrl))
+        ServerPlayConnectionEvents.DISCONNECT.register { handler, _ ->
+            systemMessage(config, "${handler.player.name.string} left the server")
+        }
+
+        ServerMessageEvents.CHAT_MESSAGE.register { chat, sender, _ ->
+            playerMessage(config, sender, chat.signedContent().trim())
+        }
+
+        ServerLifecycleEvents.SERVER_STARTING.register {
+            systemMessage(config, "Server starting...")
+        }
+        ServerLifecycleEvents.SERVER_STARTED.register {
+            systemMessage(config, "Server started.")
+        }
+        ServerLifecycleEvents.SERVER_STOPPING.register {
+            systemMessage(config, "Server stopping...")
+        }
+        ServerLifecycleEvents.SERVER_STOPPED.register {
+            systemMessage(config, "Server stopped.")
+        }
+    }
+
+    private fun systemMessage(config: Config, message: String) =
+        announce("Petal SMP", config.webhookPicture, message, config.discordWebhookUrl)
+
+    private fun playerMessage(config: Config, player: ServerPlayer, message: String) =
+        announce(player.name.string, avatarUrl(player), message, config.discordWebhookUrl)
+
+    private fun announce(
+        username: String,
+        avatarUrl: String,
+        message: String,
+        webhookUrl: String
+    ) {
+        val payload = Webhook(
+            username = username,
+            content = message,
+            avatarUrl = avatarUrl,
+            allowedMentions = Webhook.AllowedMentions.NONE
+        )
+
+        val request = HttpRequest.newBuilder()
+            .uri(URI.create(webhookUrl))
             .header("Content-Type", "application/json")
-            .method("POST", HttpRequest.BodyPublishers.ofString(json))
+            .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(payload)))
             .build()
 
-        HTTP_CLIENT.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-            .exceptionally({ e ->
-                PetalSMPTweaks.LOGGER.error("Failed to send join webhook", e)
+        httpClient.sendAsync(request, HttpResponse.BodyHandlers.discarding())
+            .exceptionally {
+                PetalSMPTweaks.LOGGER.error("Failed to send Discord webhook", it)
                 null
-            })
+            }
     }
 
-    private fun getAvatarUrl(player: ServerPlayer): String {
-        return "https://mc-heads.net/avatar/${player.stringUUID}/128"
-    }
+    private fun avatarUrl(player: ServerPlayer) =
+        "https://mc-heads.net/avatar/${player.stringUUID}/128"
 
     // https://discord.com/developers/docs/resources/webhook#execute-webhook
     private data class Webhook(
@@ -72,9 +119,9 @@ object ServerEntrypoint : DedicatedServerModInitializer {
         @SerializedName("allowed_mentions")
         val allowedMentions: AllowedMentions
     ) {
-        data class AllowedMentions(val parse: MutableList<Any>) {
+        data class AllowedMentions(val parse: List<Any>) {
             companion object {
-                val NONE = AllowedMentions(mutableListOf<Any>())
+                val NONE = AllowedMentions(emptyList())
             }
         }
     }
