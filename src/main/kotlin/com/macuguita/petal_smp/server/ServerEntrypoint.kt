@@ -39,7 +39,7 @@ object ServerEntrypoint : DedicatedServerModInitializer {
 
     private fun announce(player: ServerPlayer, message: String, webookUrl: String) {
         val webhook = Webhook(
-            "Petal SMP",
+            player.name.string,
             message,
             getAvatarUrl(player),
             Webhook.AllowedMentions.NONE
