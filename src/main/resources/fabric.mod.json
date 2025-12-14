@@ -10,6 +10,12 @@
         "adapter": "kotlin"
       }
     ],
+    "client": [
+      {
+        "value": "com.macuguita.petal_smp.client.ClientEntrypoint",
+        "adapter": "kotlin"
+      }
+    ],
     "main": [
       {
         "value": "com.macuguita.petal_smp.common.PetalSMPTweaks",
