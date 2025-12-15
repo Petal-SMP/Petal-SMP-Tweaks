@@ -24,6 +24,10 @@ package com.macuguita.petal_smp.common.commands
 
 import com.macuguita.petal_smp.common.commands.admin.OfflinePlayerPosCommand
 import com.macuguita.petal_smp.common.commands.admin.OfflineTpCommand
+import com.macuguita.petal_smp.common.commands.home.DelHomeCommand
+import com.macuguita.petal_smp.common.commands.home.HomeCommand
+import com.macuguita.petal_smp.common.commands.home.SetHomeCommand
+import com.macuguita.petal_smp.common.commands.home.SetMaxHomesCommand
 import com.macuguita.petal_smp.common.commands.spawn.SpawnCommand
 import com.macuguita.petal_smp.common.commands.tpa.TpaAcceptCommand
 import com.macuguita.petal_smp.common.commands.tpa.TpaCommand
@@ -45,6 +49,10 @@ interface CommandRegistrator {
         ) {
             OfflinePlayerPosCommand.register(dispatcher)
             OfflineTpCommand.register(dispatcher)
+            DelHomeCommand.register(dispatcher)
+            HomeCommand.register(dispatcher)
+            SetHomeCommand.register(dispatcher)
+            SetMaxHomesCommand.register(dispatcher)
             SpawnCommand.register(dispatcher)
             TpaCommand.register(dispatcher)
             TpaHereCommand.register(dispatcher)

@@ -20,25 +20,58 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+@file:Suppress("UnstableApiUsage")
+
 package com.macuguita.petal_smp.common.attachments
 
-import com.macuguita.petal_smp.common.attachments.PetalAttachedTypes.STARTER_ITEMS_ATTACHED_DATA
+import com.macuguita.petal_smp.common.PetalSMPTweaks.id
 import com.mojang.serialization.Codec
+import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry
 import net.fabricmc.fabric.api.attachment.v1.AttachmentTarget
+import net.fabricmc.fabric.api.attachment.v1.AttachmentType
 
-@Suppress("UnstableApiUsage")
-data class GivenStarterItemsAttachedData(val givenPokeballs: Boolean) {
-    companion object {
-        val CODEC: Codec<GivenStarterItemsAttachedData> =
-            Codec.BOOL.xmap(::GivenStarterItemsAttachedData, GivenStarterItemsAttachedData::givenPokeballs)
+object StarterItems {
 
-        val DEFAULT = GivenStarterItemsAttachedData(false)
-
-        fun setStarterItems(player: AttachmentTarget, givenStarterItems: Boolean = true) {
-            player.setAttached(STARTER_ITEMS_ATTACHED_DATA, GivenStarterItemsAttachedData(givenStarterItems))
+    val ATTACHMENT: AttachmentType<GivenStarterItemsAttachedData> =
+        AttachmentRegistry.create(
+            id("starter_items")
+        ) { builder ->
+            builder
+                .initializer { GivenStarterItemsAttachedData.DEFAULT }
+                .persistent(GivenStarterItemsAttachedData.CODEC)
+                .copyOnDeath()
         }
 
-        fun getStarterItems(player: AttachmentTarget): Boolean =
-            player.getAttachedOrElse(STARTER_ITEMS_ATTACHED_DATA, GivenStarterItemsAttachedData(false)).givenPokeballs
+    fun get(target: AttachmentTarget): StarterItemsData =
+        StarterItemsData(target)
+}
+
+data class GivenStarterItemsAttachedData(
+    val givenPokeballs: Boolean
+) {
+    companion object {
+        val DEFAULT = GivenStarterItemsAttachedData(false)
+
+        val CODEC: Codec<GivenStarterItemsAttachedData> =
+            Codec.BOOL.xmap(::GivenStarterItemsAttachedData, GivenStarterItemsAttachedData::givenPokeballs)
+    }
+
+    fun markGiven(): GivenStarterItemsAttachedData =
+        copy(givenPokeballs = true)
+}
+
+data class StarterItemsData(private val target: AttachmentTarget) {
+
+    private fun current(): GivenStarterItemsAttachedData =
+        target.getAttachedOrElse(StarterItems.ATTACHMENT, GivenStarterItemsAttachedData.DEFAULT)
+
+    var givenPokeballs: Boolean
+        get() = current().givenPokeballs
+        set(value) {
+            target.setAttached(StarterItems.ATTACHMENT, current().copy(givenPokeballs = value))
+        }
+
+    fun markGiven() {
+        target.setAttached(StarterItems.ATTACHMENT, current().markGiven())
     }
 }

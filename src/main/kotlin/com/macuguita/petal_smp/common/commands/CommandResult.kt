@@ -24,5 +24,10 @@ package com.macuguita.petal_smp.common.commands
 
 enum class CommandResult(val value: Int) {
     SUCCESS(1),
-    ERROR(0)
+    ERROR(0);
+
+    companion object {
+        fun fromBoolean(success: Boolean): CommandResult =
+            if (success) SUCCESS else ERROR
+    }
 }

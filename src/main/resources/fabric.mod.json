@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "petal_tweaks",
-  "version": "1.21.1-0.0.9",
+  "version": "1.21.1-0.0.10",
   "environment": "*",
   "entrypoints": {
     "server": [

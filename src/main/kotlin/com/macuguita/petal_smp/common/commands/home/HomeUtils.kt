@@ -20,21 +20,23 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.macuguita.petal_smp.common.attachments
+package com.macuguita.petal_smp.common.commands.home
 
-import com.macuguita.petal_smp.common.PetalSMPTweaks.id
-import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry
-import net.fabricmc.fabric.api.attachment.v1.AttachmentType
+import com.macuguita.petal_smp.common.attachments.Homes
+import com.mojang.brigadier.context.CommandContext
+import com.mojang.brigadier.suggestion.Suggestions
+import com.mojang.brigadier.suggestion.SuggestionsBuilder
+import net.minecraft.commands.CommandSourceStack
+import java.util.concurrent.CompletableFuture
 
-@Suppress("UnstableApiUsage")
-object PetalAttachedTypes {
-    val STARTER_ITEMS_ATTACHED_DATA: AttachmentType<GivenStarterItemsAttachedData> =
-        AttachmentRegistry.create(
-            id("starter_items_given")
-        ) { builder ->
-            builder
-                .initializer { GivenStarterItemsAttachedData.DEFAULT }
-                .persistent(GivenStarterItemsAttachedData.CODEC)
-                .copyOnDeath()
-        }
+object HomeUtils {
+    fun suggestHomes(
+        context: CommandContext<CommandSourceStack>,
+        builder: SuggestionsBuilder
+    ): CompletableFuture<Suggestions> {
+        val player = context.source.playerOrException
+        val homeNames = Homes.get(player).homes.map { it.name }
+        homeNames.forEach { builder.suggest(it) }
+        return builder.buildFuture()
+    }
 }

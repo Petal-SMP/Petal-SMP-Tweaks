@@ -23,9 +23,8 @@
 package com.macuguita.petal_smp.common
 
 import com.cobblemon.mod.common.CobblemonItems
-import com.google.common.reflect.Reflection
-import com.macuguita.petal_smp.common.attachments.GivenStarterItemsAttachedData
-import com.macuguita.petal_smp.common.attachments.PetalAttachedTypes
+import com.macuguita.petal_smp.common.attachments.Homes
+import com.macuguita.petal_smp.common.attachments.StarterItems
 import com.macuguita.petal_smp.common.commands.CommandRegistrator
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
@@ -53,21 +52,22 @@ object PetalSMPTweaks : ModInitializer {
     )
 
     override fun onInitialize() {
-        Reflection.initialize(PetalAttachedTypes::class.java)
+        Homes
+        StarterItems
         registerEvents()
     }
 
     fun registerEvents() {
         ServerPlayConnectionEvents.JOIN.register { handler, _, server ->
             val player = handler.player
-            if (!GivenStarterItemsAttachedData.getStarterItems(player)) {
+            if (!StarterItems.get(player).givenPokeballs) {
                 givePokeballs(player)
                 givePokedex(player)
                 server.playerList.broadcastSystemMessage(
                     Component.literal(player.name.string + " has joined for the first time, say hi!")
                         .withStyle(ChatFormatting.YELLOW), false
                 )
-                GivenStarterItemsAttachedData.setStarterItems(player, true)
+                StarterItems.get(player).markGiven()
             }
         }
         CommandRegistrationCallback.EVENT.register(CommandRegistrator.RegisterCommands())

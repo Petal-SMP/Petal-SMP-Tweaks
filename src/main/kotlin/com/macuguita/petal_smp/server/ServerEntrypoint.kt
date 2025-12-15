@@ -34,10 +34,13 @@ import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
+import java.time.Duration
 
 object ServerEntrypoint : DedicatedServerModInitializer {
 
-    private val httpClient = HttpClient.newHttpClient()
+    private val httpClient = HttpClient.newBuilder()
+        .connectTimeout(Duration.ofSeconds(5))
+        .build()
     private val gson = Gson()
 
     override fun onInitializeServer() {
@@ -96,11 +99,13 @@ object ServerEntrypoint : DedicatedServerModInitializer {
 
         val request = HttpRequest.newBuilder()
             .uri(URI.create(webhookUrl))
+            .timeout(Duration.ofSeconds(5))
             .header("Content-Type", "application/json")
             .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(payload)))
             .build()
 
         httpClient.sendAsync(request, HttpResponse.BodyHandlers.discarding())
+            .thenAccept { }
             .exceptionally {
                 PetalSMPTweaks.LOGGER.error("Failed to send Discord webhook", it)
                 null
