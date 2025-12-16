@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "petal_tweaks",
-  "version": "1.21.1-0.0.11",
+  "version": "1.21.1-0.0.12",
   "environment": "*",
   "entrypoints": {
     "server": [
@@ -34,7 +34,9 @@
     "fabric-api": "*",
     "macu_lib": "\u003e\u003d1.0.5-1.21.1",
     "cobblemon": "*",
-    "fabric-language-kotlin": "*"
+    "fabric-language-kotlin": "*",
+    "supermartijn642configlib": "\u003e\u003d1.1.8",
+    "architectury": "13.x"
   },
   "name": "Petal SMP Tweaks",
   "description": "petal smp tweaks",

@@ -44,6 +44,7 @@ repositories {
         Triple("TerraformersMC", "https://maven.terraformersmc.com/", listOf("com.terraformersmc", "dev.emi")),
         Triple("Modrinth", "https://api.modrinth.com/maven", listOf("maven.modrinth")),
         Triple("ParchmentMC", "https://maven.parchmentmc.org", listOf("org.parchmentmc.data")),
+        Triple("Architectury", "https://maven.architectury.dev/", listOf("dev.architectury")),
     )
 
     exclusiveRepos.forEach { (name, url, groups) ->
@@ -84,7 +85,24 @@ dependencies {
         exclude("net.fabricmc.fabric-api")
     }
 
+    modImplementation("maven.modrinth:only-bottle-caps:1.3.0"){
+        exclude("net.fabricmc.fabric-api")
+    }
+    include("maven.modrinth:only-bottle-caps:1.3.0")
+
+    modImplementation("maven.modrinth:simpletms-tms-and-trs-for-cobblemon:uWiIETYV"){
+        exclude("net.fabricmc.fabric-api")
+    }
+    include("maven.modrinth:simpletms-tms-and-trs-for-cobblemon:uWiIETYV")
+
     modImplementation("com.terraformersmc:modmenu:${BuildConfig.modMenuVersion}"){
+        exclude("net.fabricmc.fabric-api")
+    }
+
+    modRuntimeOnly("dev.architectury:architectury-fabric:13.0.8"){
+        exclude("net.fabricmc.fabric-api")
+    }
+    modRuntimeOnly("maven.modrinth:supermartijn642s-config-lib:1.1.8-fabric-mc1.21"){
         exclude("net.fabricmc.fabric-api")
     }
 }
@@ -128,6 +146,8 @@ tasks.register<net.fabricmc.loom.task.FabricModJsonV1Task>("genModJson") {
         depends("macu_lib", ">=${BuildConfig.maculibVersion}")
         depends("cobblemon", "*")
         depends("fabric-language-kotlin", "*")
+        depends("supermartijn642configlib", ">=1.1.8")
+        depends("architectury", "13.x")
     }
 }
 
