@@ -60,14 +60,15 @@ object PetalSMPTweaks : ModInitializer {
     fun registerEvents() {
         ServerPlayConnectionEvents.JOIN.register { handler, _, server ->
             val player = handler.player
-            if (!StarterItems.get(player).givenPokeballs) {
+            val attachedData = StarterItems.get(player)
+            if (!attachedData.givenPokeballs) {
                 givePokeballs(player)
                 givePokedex(player)
                 server.playerList.broadcastSystemMessage(
                     Component.literal(player.name.string + " has joined for the first time, say hi!")
                         .withStyle(ChatFormatting.YELLOW), false
                 )
-                StarterItems.get(player).markGiven()
+                attachedData.markGiven()
             }
         }
         CommandRegistrationCallback.EVENT.register(CommandRegistrator.RegisterCommands())

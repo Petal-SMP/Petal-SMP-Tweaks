@@ -33,7 +33,7 @@ import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.Commands
 import net.minecraft.commands.Commands.literal
 import net.minecraft.network.chat.Component
-import net.minecraft.server.level.ServerLevel
+import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerPlayer
 
 object HomeCommand : CommandRegistrator {
@@ -46,37 +46,44 @@ object HomeCommand : CommandRegistrator {
                         .executes { ctx ->
                             val player = ctx.source.playerOrException
                             val name = StringArgumentType.getString(ctx, "name")
-                            return@executes CommandResult.fromBoolean(teleportToHome(player, name)).value
+                            return@executes CommandResult.fromBoolean(
+                                teleportToHome(
+                                    player,
+                                    ctx.source.server,
+                                    name
+                                )
+                            ).value
                         }
                 )
                 .executes { ctx ->
                     val player = ctx.source.playerOrException
-                    return@executes CommandResult.fromBoolean(teleportToHome(player, "home")).value
+                    return@executes CommandResult.fromBoolean(teleportToHome(player, ctx.source.server, "home")).value
                 }
         )
     }
 
-    private fun teleportToHome(player: ServerPlayer, name: String): Boolean {
+    private fun teleportToHome(player: ServerPlayer, server: MinecraftServer, name: String): Boolean {
         val homeData: HomeData = Homes.get(player)
-        val home = homeData.homes.find { it.name == name.lowercase() }
-
-        if (home == null) {
+        val home = homeData.homes.find { it.name == name.lowercase() } ?: run {
             player.sendSystemMessage(Component.literal("Home '$name' does not exist.").withStyle(ChatFormatting.RED))
             return false
         }
-
-        val level = player.level()
-        if (level is ServerLevel) {
-            player.teleportTo(
-                level,
-                home.position.x + 0.5,
-                home.position.y.toDouble(),
-                home.position.z + 0.5,
-                player.yRot,
-                player.xRot
+        val level = server.getLevel(home.dimension) ?: run {
+            player.sendSystemMessage(
+                Component.literal("Couldn't find ${home.dimension}.").withStyle(ChatFormatting.RED)
             )
-            player.sendSystemMessage(Component.literal("Teleported to home '$name'."))
+            return false
         }
+
+        player.teleportTo(
+            level,
+            home.position.x + 0.5,
+            home.position.y.toDouble(),
+            home.position.z + 0.5,
+            player.yRot,
+            player.xRot
+        )
+        player.sendSystemMessage(Component.literal("Teleported to home '$name'."))
         return true
     }
 }

@@ -106,7 +106,7 @@ tasks.register<net.fabricmc.loom.task.FabricModJsonV1Task>("genModJson") {
             "homepage" to "https://macuguita.com",
         ))
         licenses = listOf(BuildConfig.license)
-        if (project.file("assets/${BuildConfig.modId}/icon.png").exists()) {
+        if (project.file("src/main/resources/assets/${BuildConfig.modId}/icon.png").exists()) {
             icon("assets/${BuildConfig.modId}/icon.png")
         }
         if (project.file("src/main/resources/${BuildConfig.modId}.mixins.json").exists()) {
