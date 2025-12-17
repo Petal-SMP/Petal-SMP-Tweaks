@@ -20,16 +20,26 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.macuguita.petal_smp.mixin;
+package com.macuguita.petal_smp.mixin.secret_spectator;
 
+import java.util.List;
+
+import org.spongepowered.asm.mixin.Debug;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-import net.minecraft.server.players.PlayerList;
-import net.minecraft.world.level.storage.PlayerDataStorage;
+import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 
-@Mixin(PlayerList.class)
-public interface PlayerListAccessor {
-	@Accessor("playerIo")
-	PlayerDataStorage petal$getPlayerIo();
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
+@Debug(export = true)
+@Environment(EnvType.SERVER)
+@Mixin(ClientboundPlayerInfoUpdatePacket.class)
+public interface ClientboundPlayerInfoUpdatePacketAccessor {
+
+	@Mutable
+	@Accessor("entries")
+	void petal$setEntries(List<ClientboundPlayerInfoUpdatePacket.Entry> entries);
 }

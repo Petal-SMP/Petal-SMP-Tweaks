@@ -24,7 +24,7 @@ package com.macuguita.petal_smp.common.commands.admin
 
 import com.macuguita.petal_smp.common.commands.CommandRegistrator
 import com.macuguita.petal_smp.common.commands.CommandResult
-import com.macuguita.petal_smp.mixin.PlayerListAccessor
+import com.macuguita.petal_smp.mixin.data.PlayerListAccessor
 import com.mojang.brigadier.CommandDispatcher
 import net.minecraft.ChatFormatting
 import net.minecraft.commands.CommandSourceStack

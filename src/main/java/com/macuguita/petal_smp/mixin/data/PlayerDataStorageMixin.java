@@ -20,7 +20,7 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.macuguita.petal_smp.mixin;
+package com.macuguita.petal_smp.mixin.data;
 
 import java.io.File;
 import java.nio.file.Files;
