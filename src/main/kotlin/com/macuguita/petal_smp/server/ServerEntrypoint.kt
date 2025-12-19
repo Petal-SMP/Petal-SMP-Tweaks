@@ -46,6 +46,8 @@ object ServerEntrypoint : DedicatedServerModInitializer {
     override fun onInitializeServer() {
         val config = Config.loadOrCreate()
 
+        ConnectionManager.init(config.uuids)
+
         if (config.discordWebhookUrl.isBlank()) return
 
         registerEvents(config)

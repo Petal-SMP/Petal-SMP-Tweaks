@@ -22,6 +22,7 @@
 
 package com.macuguita.petal_smp.server
 
+import com.macuguita.petal_smp.common.PetalSMPTweaks
 import net.fabricmc.loader.api.FabricLoader
 import java.io.IOException
 import java.nio.file.Files
@@ -30,7 +31,8 @@ import java.util.*
 
 data class Config(
     val discordWebhookUrl: String,
-    val webhookPicture: String
+    val webhookPicture: String,
+    val uuids: Set<UUID> = emptySet(),
 ) {
     companion object {
 
@@ -52,8 +54,9 @@ data class Config(
             }
 
             val config = Config(
-                get(properties, "discordWebhookUrl", ""),
-                get(properties, "webhookPicture", "")
+                discordWebhookUrl = get(properties, "discordWebhookUrl", ""),
+                webhookPicture = get(properties, "webhookPicture", ""),
+                uuids = parseUUIDs(get(properties, "uuids", "")),
             )
 
             Files.newBufferedWriter(path).use { writer ->
@@ -72,6 +75,23 @@ data class Config(
                 properties.setProperty(key, defaultValue)
             }
             return properties.getProperty(key)
+        }
+
+        private fun parseUUIDs(uuidString: String): Set<UUID> {
+            return uuidString.split(',')
+                .map { it.trim() }
+                .filter { it.isNotBlank() }
+                .mapNotNull { parseUUID(it) }
+                .toSet()
+        }
+
+        private fun parseUUID(uuidString: String): UUID? {
+            return try {
+                UUID.fromString(uuidString)
+            } catch (e: IllegalArgumentException) {
+                PetalSMPTweaks.LOGGER.info("Invalid UUID format: $uuidString (must be standard UUID format with dashes)")
+                null
+            }
         }
     }
 }
